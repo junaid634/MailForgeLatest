@@ -7,7 +7,7 @@ const emailConfigSchema = new Schema(
 		id: {
 			type: String,
 			required: true,
-			default: () => crypto.randomUUID(),
+			default: new mongoose.Types.ObjectId(),
 		},
 		name: {
 			type: String,
@@ -56,8 +56,9 @@ const userSchema = new Schema<IUser>(
 userSchema.pre('save', async function (next) {
 	if (this.isModified('emailConfigs')) {
 		const defaultConfigs = this.emailConfigs.filter(
-			(config) => config.isDefault
+			(config) => config?.isDefault
 		)
+
 		if (defaultConfigs.length > 1) {
 			throw new Error('Only one default email configuration allowed')
 		}

@@ -158,8 +158,9 @@ const userController = {
 	}),
 
 	addEmailConfig: asyncHandler(async (req: Request, res: Response) => {
-		const emailConfig = req.body.emailConfig
+		const emailConfig = req.body
 		const userId = req.user?._id
+
 		if (!userId) {
 			return res.status(401).json({
 				success: false,
@@ -175,6 +176,7 @@ const userController = {
 		}
 
 		user.emailConfigs.push(emailConfig)
+		console.log('this is user', user)
 
 		await user.save()
 		res.json({
@@ -184,7 +186,7 @@ const userController = {
 	}),
 	deleteEmailConfig: asyncHandler(async (req: Request, res: Response) => {
 		try {
-			const emailConfigId = req.params.emailConfigId
+			const emailConfigId = req.params.id
 			const userId = req.user?._id
 
 			// Check if userId exists
@@ -286,7 +288,7 @@ const userController = {
 	setDefaultEmailConfig: asyncHandler(async (req: Request, res: Response) => {
 		try {
 			const userId = req.user?._id // Assuming `req.user` contains authenticated user info
-			const emailConfigId = req.params.emailConfigId
+			const emailConfigId = req.params.id
 
 			// Check if userId exists
 			if (!userId) {

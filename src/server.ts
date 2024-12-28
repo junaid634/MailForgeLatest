@@ -15,9 +15,11 @@ const PORT = environment.PORT
 
 app.use(cors())
 app.use(express.json())
-
+app.get('/', (_, res) => {
+	res.send('Hallo Junaid')
+})
 // Routes
-app.use('/api', routes)
+app.use('/api/v1', routes)
 
 // Error handling
 app.use(errorHandler)

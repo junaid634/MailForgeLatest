@@ -21,18 +21,19 @@ class EmailService {
 		emailConfigId?: string | undefined
 	): Promise<EmailResponse> {
 		try {
-			if (!user.emailConfig?.smtp) {
-				throw new Error('SMTP configuration not found')
-			}
+			// if (!user.emailConfig?.smtp) {
+			// 	throw new Error('SMTP configuration not found')
+			// }
 			const userEmail = await User.findById(user._id)
 				.select('emailConfigs')
 				.lean()
 			if (!userEmail) {
 				throw new Error('User not found')
 			}
-			const [emailConfig] = userEmail.emailConfigs.filter(
-				(e) => e.id === emailConfigId
-			)
+			const emailConfig = userEmail.emailConfigs.find((e) => e.isDefault)
+			if (!emailConfig) {
+				throw new Error('Email configuration not found')
+			}
 			const transporter = this.createTransporter(emailConfig.smtp)
 
 			const result = await transporter.sendMail({
