@@ -45,6 +45,7 @@ export interface ReceivedEmail {
 	date: Date
 	text?: string
 	html?: string
+	headerLines: any
 }
 
 export interface GetEmailsResponse {

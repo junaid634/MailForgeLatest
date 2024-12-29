@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import environment from '../config/environments.js'
 import User from '../models/User'
 import { EmailConfigWithName } from '../types'
 import { asyncHandler } from '../utils/asyncHandler'
@@ -124,10 +125,9 @@ const userController = {
 			password,
 		})
 
-		const token = jwt.sign(
-			{ userId: user._id },
-			process.env.JWT_SECRET || 'default-secret'
-		)
+		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+			expiresIn: environment.JWT_SECRET_EXPIRES,
+		})
 
 		res.status(201).json({
 			success: true,

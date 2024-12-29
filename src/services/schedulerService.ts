@@ -1,24 +1,26 @@
+import crypto from 'crypto'
+import { ScheduleModel } from '../models/Schedule'
+import User from '../models/User'
 import { IUser } from '../types'
-import { Schedule, ScheduledEmail } from '../types/scheduler'
+import { ISchedule } from '../types/scheduler'
 import emailService from './emailService'
 
 export class SchedulerService {
-	private schedules: Map<string, Schedule> = new Map()
-
 	constructor() {
 		this.startScheduler()
 	}
 
-	async scheduleEmail(user: IUser, email: ScheduledEmail): Promise<string> {
+	async scheduleEmail(user: IUser, email: ISchedule['email']): Promise<string> {
 		const scheduleId = crypto.randomUUID()
-		const schedule: Schedule = {
+
+		const schedule = new ScheduleModel({
 			id: scheduleId,
 			userId: user._id,
 			email,
 			status: 'pending',
-		}
+		})
 
-		this.schedules.set(scheduleId, schedule)
+		await schedule.save()
 		return scheduleId
 	}
 
@@ -28,17 +30,20 @@ export class SchedulerService {
 
 	private async processSchedules(): Promise<void> {
 		const now = new Date()
-		for (const [id, schedule] of this.schedules) {
-			if (
-				schedule.status === 'pending' &&
-				new Date(schedule.email.sendAt) <= now
-			) {
-				await this.processSchedule(schedule)
-			}
+		console.log('scheduler is running')
+
+		// Find pending schedules whose sendAt time is due
+		const schedules = await ScheduleModel.find({
+			status: 'pending',
+			'email.sendAt': { $lte: now },
+		})
+
+		for (const schedule of schedules) {
+			await this.processSchedule(schedule)
 		}
 	}
 
-	private async processSchedule(schedule: Schedule): Promise<void> {
+	private async processSchedule(schedule: ISchedule): Promise<void> {
 		try {
 			const user = await this.getUserById(schedule.userId)
 			if (!user) return
@@ -51,27 +56,28 @@ export class SchedulerService {
 			})
 
 			schedule.status = 'completed'
+			await schedule.save()
 		} catch (error) {
 			schedule.status = 'failed'
 			schedule.error = error instanceof Error ? error.message : 'Unknown error'
+			await schedule.save()
 		}
 	}
 
 	private async getUserById(userId: string): Promise<IUser | null> {
-		// Implement user retrieval logic
-		return null
-	}
-	public async getScheduledEmails(user: IUser) {
-		const scheduledEmails = []
-		for (const [id, schedule] of this.schedules) {
-			if (schedule.userId === user._id) {
-				scheduledEmails.push(schedule.email)
-			}
+		const user = await User.findById(userId).lean()
+		if (!user) {
+			throw new Error(`User ${userId} not found`)
 		}
-		return scheduledEmails
+		return user
 	}
+
+	public async getScheduledEmails(user: IUser) {
+		return await ScheduleModel.find({ userId: user._id })
+	}
+
 	public async cancelSchedule(emailId: string) {
-		this.schedules.delete(emailId)
+		await ScheduleModel.findOneAndDelete({ id: emailId })
 	}
 }
 

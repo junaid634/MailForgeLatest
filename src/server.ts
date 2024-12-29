@@ -5,6 +5,7 @@ import connectDB from './config/database'
 import environment from './config/environments'
 import errorHandler from './middleware/errorHandler'
 import routes from './routes'
+import authRouter from './routes/authRoutes'
 
 dotenv.config()
 
@@ -20,6 +21,7 @@ app.get('/', (_, res) => {
 })
 // Routes
 app.use('/api/v1', routes)
+app.use('/auth', authRouter)
 
 // Error handling
 app.use(errorHandler)

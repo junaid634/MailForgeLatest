@@ -1,8 +1,6 @@
 import imapSimple from 'imap-simple'
 import { simpleParser } from 'mailparser'
 import { GetEmailsResponse, IUser, ReceivedEmail } from '../types'
-import spamFilterService from './spamFilterService'
-
 class EmailReceiver {
 	async getEmails(
 		user: IUser,
@@ -10,11 +8,15 @@ class EmailReceiver {
 		limit: number = 10,
 		filterSpam: boolean = true
 	): Promise<GetEmailsResponse> {
+		//
 		try {
+			console.log(limit)
+
 			const config = user.emailConfigs.find((c) => c.isDefault)
 			if (!config?.imap) {
 				throw new Error('IMAP configuration not found or invalid')
 			}
+			console.log('this is config', config)
 
 			const connection = await imapSimple.connect({
 				imap: {
@@ -27,6 +29,7 @@ class EmailReceiver {
 				},
 			})
 			const folders = await connection.getBoxes()
+			// console.log(folders['[Gmail]'].children)
 			if (!folders[folder]) {
 				throw new Error(`Folder "${folder}" not found.`)
 			}
@@ -42,19 +45,23 @@ class EmailReceiver {
 			const messages = await connection.search(searchCriteria, fetchOptions)
 			const emails: ReceivedEmail[] = []
 
+			// return { success: true, emails: messages }
 			for (let i = 0; i < messages.length; i++) {
 				const message = messages[i]
+				// console.log(message)
+
 				const part = message.parts.find((part) => part.which === 'TEXT')
 				if (part) {
 					const parsedEmail = await simpleParser(part.body)
+					console.log(parsedEmail)
 
 					// Check if email is spam
-					if (filterSpam) {
-						const spamScore = spamFilterService.calculateSpamScore(parsedEmail)
-						if (spamScore.isSpam) {
-							continue // Skip spam emails
-						}
-					}
+					// if (filterSpam) {
+					// 	const spamScore = spamFilterService.calculateSpamScore(parsedEmail)
+					// 	if (spamScore.isSpam) {
+					// 		continue // Skip spam emails
+					// 	}
+					// }
 
 					emails.push({
 						id: message.attributes.uid.toString(),
@@ -63,6 +70,7 @@ class EmailReceiver {
 						date: parsedEmail.date || new Date(),
 						text: parsedEmail.text,
 						html: parsedEmail.html || undefined,
+						headerLines: parsedEmail.headerLines || undefined,
 					})
 
 					if (emails.length >= limit) {
@@ -72,7 +80,8 @@ class EmailReceiver {
 			}
 
 			connection.end()
-			return { success: true, emails }
+			const email = await this.cleanEmailData(emails)
+			return { success: true, emails: email }
 		} catch (error) {
 			console.error('Failed to fetch emails:', error)
 			return {
@@ -80,6 +89,41 @@ class EmailReceiver {
 				error: error instanceof Error ? error.message : 'Unknown error',
 			}
 		}
+	}
+	async cleanEmailData(emails: ReceivedEmail[]): Promise<ReceivedEmail[]> {
+		return emails.map((email) => {
+			// Clean subject
+			const subject = email.subject.trim() || 'No Subject'
+
+			// Clean "from" field
+			const from = email.from.trim() || 'Unknown Sender'
+
+			// Clean and sanitize text
+			let sanitizedText = ''
+			if (email?.text) {
+				sanitizedText = this.sanitizeText(email?.text)
+			}
+
+			return {
+				id: email.id,
+				subject,
+				from,
+				date: new Date(email.date), // Ensure it's a Date object
+				text: sanitizedText,
+				html: email.html || undefined,
+				headerLines: email.headerLines || undefined,
+			}
+		})
+	}
+
+	// Helper function to clean and sanitize text content
+	sanitizeText(text: string): string {
+		// Remove URLs and unnecessary line breaks, extra spaces, etc.
+		return text
+			.replace(/<[^>]*>/g, '') // Remove any HTML tags
+			.replace(/\n+/g, ' ') // Replace multiple line breaks with a single space
+			.replace(/\s{2,}/g, ' ') // Replace multiple spaces with a single space
+			.trim()
 	}
 
 	// ... rest of the class implementation

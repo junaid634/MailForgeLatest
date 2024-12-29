@@ -1,17 +1,9 @@
 import { Request, Response, Router } from 'express'
 import { google } from 'googleapis'
 import { oAuth2Client } from '../services/Auth0Services'
-import emailRoutes from './emailRoutes'
-import spamRoutes from './spamRoutes'
-import userRoutes from './userRoutes'
 
-const router = Router()
-
-router.use('/emails', emailRoutes)
-router.use('/users', userRoutes)
-router.use('/spam', spamRoutes)
-
-router.get('/auth/url', (_, res) => {
+const authRouter = Router()
+authRouter.get('/url', (_, res) => {
 	const authUrl = oAuth2Client.generateAuthUrl({
 		access_type: 'offline',
 		scope: [
@@ -23,29 +15,26 @@ router.get('/auth/url', (_, res) => {
 })
 
 // 2. Handle OAuth Callback for a user
-router.get(
-	'/auth/google',
-	async (req: Request, res: Response): Promise<any> => {
-		const code = req.query.code as string
-		if (!code) {
-			return res.status(400).send({ error: 'Authorization code is required.' })
-		}
-
-		try {
-			const data = await oAuth2Client.getToken(code)
-			console.log(data)
-
-			oAuth2Client.setCredentials(data.tokens)
-			res.send({ tokens: data.tokens })
-		} catch (error) {
-			console.error('Error exchanging authorization code:', error)
-			res.status(500).send({ error: 'Failed to exchange authorization code.' })
-		}
+authRouter.get('/google', async (req: Request, res: Response): Promise<any> => {
+	const code = req.query.code as string
+	if (!code) {
+		return res.status(400).send({ error: 'Authorization code is required.' })
 	}
-)
+
+	try {
+		const data = await oAuth2Client.getToken(code)
+		console.log(data)
+
+		oAuth2Client.setCredentials(data.tokens)
+		res.send({ tokens: data.tokens })
+	} catch (error) {
+		console.error('Error exchanging authorization code:', error)
+		res.status(500).send({ error: 'Failed to exchange authorization code.' })
+	}
+})
 
 // 3. Get User Emails
-router.get('/emails', async (req: Request, res: Response): Promise<any> => {
+authRouter.get('/emails', async (req: Request, res: Response): Promise<any> => {
 	const token = req.headers['authorization']
 	let accessToken = ''
 	if (token && token.startsWith('Bearer ')) {
@@ -110,7 +99,7 @@ router.get('/emails', async (req: Request, res: Response): Promise<any> => {
 })
 
 // 4. Send Email on behalf of a user
-router.post('/send-email', async (req, res): Promise<any> => {
+authRouter.post('/send-email', async (req, res): Promise<any> => {
 	const { to, subject, body } = req.body
 	const token = req.headers['authorization']
 	let accessToken = ''
@@ -150,4 +139,4 @@ router.post('/send-email', async (req, res): Promise<any> => {
 	}
 })
 
-export default router
+export default authRouter

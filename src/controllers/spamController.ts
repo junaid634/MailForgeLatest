@@ -19,7 +19,3 @@ export const getSpamEmails = asyncHandler(
 		})
 	}
 )
-
-export default {
-	getSpamEmails,
-}
