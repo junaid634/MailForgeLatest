@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist/server.js",
+    "start": "tsc && node --max-old-space-size=4096 dist/server.js",
     "dev": "ts-node-dev --respawn src/server.ts",
     "prod": "nodemon dist/server.js",
     "test": "vitest",
