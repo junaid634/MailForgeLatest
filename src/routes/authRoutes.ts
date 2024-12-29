@@ -39,7 +39,7 @@ authRouter.get('/emails', async (req: Request, res: Response): Promise<any> => {
 	let accessToken = ''
 	if (token && token.startsWith('Bearer ')) {
 		accessToken = token.split(' ')[1]
-		console.log(token)
+		// console.log(token)
 	} else {
 		console.log('No bearer token provided')
 	}
@@ -47,7 +47,7 @@ authRouter.get('/emails', async (req: Request, res: Response): Promise<any> => {
 	if (!accessToken) {
 		return res.status(401).send({ error: 'Access token is required.' })
 	}
-	console.log(accessToken)
+	// console.log(accessToken)
 
 	try {
 		oAuth2Client.setCredentials({ access_token: accessToken })

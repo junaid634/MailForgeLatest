@@ -176,7 +176,7 @@ const userController = {
 		}
 
 		user.emailConfigs.push(emailConfig)
-		console.log('this is user', user)
+		// console.log('this is user', user)
 
 		await user.save()
 		res.json({
