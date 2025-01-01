@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { google } from 'googleapis'
 import { oAuth2Client } from '../services/Auth0Services'
+import draftRoutes from './draftRoutes'
 import emailRoutes from './emailRoutes'
 import spamRoutes from './spamRoutes'
 import userRoutes from './userRoutes'
@@ -10,6 +11,7 @@ const router = Router()
 router.use('/emails', emailRoutes)
 router.use('/users', userRoutes)
 router.use('/spam', spamRoutes)
+router.use('/draft', draftRoutes)
 
 router.get('/auth/url', (_, res) => {
 	const authUrl = oAuth2Client.generateAuthUrl({

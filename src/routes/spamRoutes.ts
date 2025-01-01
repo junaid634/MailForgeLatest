@@ -12,8 +12,8 @@ router.use(auth)
 router.get(
 	'/',
 	[
-		query('folder').default('INBOX'),
-		query('limit').isInt({ min: 1, max: 100 }).default(50),
+		query('folder').optional().default('INBOX'),
+		query('limit').optional().isInt({ min: 1, max: 100 }).default(50),
 		validate,
 	],
 	getSpamEmails
