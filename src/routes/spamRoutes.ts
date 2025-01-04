@@ -8,7 +8,7 @@ import validate from '../middleware/validate'
 const router = Router()
 
 router.use(auth)
-
+// Get spam emails
 router.get(
 	'/',
 	[

@@ -16,6 +16,7 @@ export class SpamFilterService {
 		'prize',
 		'investment opportunity',
 		'cryptocurrency deal',
+		'inscription',
 	]
 
 	private spamPatterns = [
@@ -24,6 +25,7 @@ export class SpamFilterService {
 		/\b(free|win|won|winner|winning)\b/i,
 		/\b(urgent|immediate|action required)\b/i,
 		/\b(bitcoin|crypto|cryptocurrency)\b/i,
+		/\b(inscription required|registration fee|mandatory fee)\b/i, // Added for inscription filtering
 	]
 
 	public calculateSpamScore(email: ParsedMail): SpamScore {
@@ -73,11 +75,28 @@ export class SpamFilterService {
 			reasons.push('Multiple exclamation marks in subject')
 		}
 
+		// DKIM Filtering
+		if (!email.headers.has('dkim-signature')) {
+			score += 3
+			reasons.push('Missing DKIM signature')
+		} else {
+			const dkimSignature = email.headers.get('dkim-signature') as string
+			if (!this.isValidDkim(dkimSignature)) {
+				score += 3
+				reasons.push('Invalid DKIM signature')
+			}
+		}
+
 		return {
 			score,
 			isSpam: score >= 5,
 			reasons,
 		}
+	}
+
+	private isValidDkim(dkimSignature: string): boolean {
+		// Placeholder logic for validating DKIM. Replace with actual validation logic.
+		return dkimSignature.includes('v=1')
 	}
 
 	async getSpamEmails(

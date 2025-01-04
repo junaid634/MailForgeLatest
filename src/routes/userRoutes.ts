@@ -68,9 +68,9 @@ router.post(
 	],
 	userController.addEmailConfig
 )
-
+//get email configs
 router.get('/email-configs', auth, userController.getEmailConfigs)
-
+//update email config
 router.put(
 	'/email-config/:id',
 	auth,
