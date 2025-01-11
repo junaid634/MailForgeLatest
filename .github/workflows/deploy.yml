@@ -39,4 +39,4 @@ jobs:
           fi
       
       - name: Run new container
-        run: docker run -d -p 80:80 -p 443:443 --restart=always --name mailforge junaid634/mailforge:latest
+        run: docker run -d -p 3000 -p 80:80 -p 443:443 --restart=always --name mailforge junaid634/mailforge:latest
