@@ -24,7 +24,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [self-hosted]  # Replace with the actual runner name or label
+    runs-on: [ip-172-31-1-59]  # Replace with the actual runner name or label
     steps:
       - name: Pull image from Docker Hub
         run: docker pull junaid634/mailforge:latest
