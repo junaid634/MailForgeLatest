@@ -1,0 +1,38 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your main branch name
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t junaid634/mailforge:latest .
+
+      - name: Push Docker image
+        run: docker push junaid634/mailforge:latest
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted]  # Replace with the actual runner name or label
+    steps:
+      - name: Pull image from Docker Hub
+        run: docker pull junaid634/mailforge:latest
+
+      - name: Stop and remove existing containers
+        run: |
+          docker container stop $(docker container ls -aq)
+          docker container rm $(docker container ls -aq)
+
+      - name: Run new container
+        run: docker run -d -p 80:80 -p 443:443 --restart=always --name mailforge junaid634/mailforge:latest
