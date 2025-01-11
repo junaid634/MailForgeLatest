@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Adjust to your main branch 
+      - main  # Adjust to your main branch good well
   workflow_dispatch:
 
 jobs:
