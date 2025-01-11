@@ -31,8 +31,12 @@ jobs:
 
       - name: Stop and remove existing containers
         run: |
-          docker container stop $(docker container ls -aq)
-          docker container rm $(docker container ls -aq)
-
+          if [ "$(docker container ls -aq)" ]; then
+            docker container stop $(docker container ls -aq)
+            docker container rm $(docker container ls -aq)
+          else
+            echo "No containers to stop or remove."
+          fi
+      
       - name: Run new container
         run: docker run -d -p 80:80 -p 443:443 --restart=always --name mailforge junaid634/mailforge:latest
