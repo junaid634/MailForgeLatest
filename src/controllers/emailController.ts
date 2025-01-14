@@ -56,7 +56,7 @@ const emailController = {
 	}),
 
 	scheduleEmail: asyncHandler(async (req: Request, res: Response) => {
-		const { to, subject, text, html, sendAt, emailConfigId } = req.body
+		const { to, subject, text, html, sendAt } = req.body
 
 		const scheduleId = await schedulerService.scheduleEmail(req.user!, {
 			to,

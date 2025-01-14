@@ -43,7 +43,7 @@ router.post(
 		body('subject').notEmpty().withMessage('Subject is required'),
 		body('text').optional(),
 		body('html').optional(),
-		body('scheduledTime').isISO8601().withMessage('Valid ISO date required'),
+		body('sendAt').isISO8601().withMessage('Valid ISO date required'),
 		body('emailConfigId').optional().isString(),
 		validate,
 	],

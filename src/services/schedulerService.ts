@@ -77,7 +77,7 @@ export class SchedulerService {
 	}
 
 	public async cancelSchedule(emailId: string) {
-		await ScheduleModel.findOneAndDelete({ id: emailId })
+		await ScheduleModel.findOneAndDelete({ _id: emailId })
 	}
 }
 
