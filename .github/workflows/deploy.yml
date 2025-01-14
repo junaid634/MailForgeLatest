@@ -39,7 +39,9 @@ jobs:
           fi
       
       - name: Run new container
-        run: docker run -d -p 3000 -p 443:3000 -p 80:3000\
+        run: docker run -d -p 3000:3000 \
+          -p 443:3000 \
+          -p 80:3000 \
           -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
           -e JWT_SECRET_EXPIRES='14d' \
           -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
