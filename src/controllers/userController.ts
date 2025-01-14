@@ -150,6 +150,7 @@ const userController = {
 			{ userId: user._id },
 			process.env.JWT_SECRET || 'default-secret'
 		)
+		console.log(process.env.JWT_SECRET)
 
 		res.json({
 			success: true,

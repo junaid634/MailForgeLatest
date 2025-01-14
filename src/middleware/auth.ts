@@ -12,6 +12,7 @@ const auth = async (
 		if (!token) {
 			throw new Error()
 		}
+		console.log(process.env.JWT_SECRET)
 
 		const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
 			userId: string
