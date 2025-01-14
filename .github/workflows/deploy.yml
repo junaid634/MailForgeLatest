@@ -24,7 +24,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Use the label of your self-hosted runner
+    runs-on: self-hosted  
     steps:
       - name: Pull image from Docker Hub
         run: docker pull junaid634/mailforge:latest
@@ -39,4 +39,4 @@ jobs:
           fi
       
       - name: Run new container
-        run: docker run -d -p 3000 -p 80:3000 -p 443:3000 --restart=always --name mailforge junaid634/mailforge:latest
+        run: docker run -d -p 3000 -p 443:3000 -p 80:3000 --restart=always --name mailforge junaid634/mailforge:latest
