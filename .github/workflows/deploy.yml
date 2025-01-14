@@ -40,24 +40,25 @@ jobs:
       
       - name: Run new container
         run: docker run -d \
-          -p 3000:3000 \
-          -p 443:3000 \
-          -p 80:3000 \
-          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          -e JWT_SECRET_EXPIRES='14d' \
-          -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
-          -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
-          -e REDIRECT_URI=${{ secrets.REDIRECT_URI }} \
-          -e MONGODB_URI=${{ secrets.MONGODB_URI }} \
-          -e SMTP_HOST=${{ secrets.SMTP_HOST }} \
-          -e SMTP_PORT=${{ secrets.SMTP_PORT }} \
-          -e SMTP_USER=${{ secrets.SMTP_USER }} \
-          -e SMTP_PASS=${{ secrets.SMTP_PASS }} \
-          -e IMAP_HOST=${{ secrets.IMAP_HOST }} \
-          -e IMAP_PORT=${{ secrets.IMAP_PORT }} \
-          -e IMAP_USER=${{ secrets.IMAP_USER }} \
-          -e IMAP_PASS=${{ secrets.IMAP_PASS }} \
-          --restart=always \
-          --name mailforge \
-          junaid634/mailforge:latest
+              -p 3000:3000 \
+              -p 443:3000 \
+              -p 80:3000 \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e JWT_SECRET_EXPIRES='14d' \
+              -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
+              -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+              -e REDIRECT_URI=${{ secrets.REDIRECT_URI }} \
+              -e MONGODB_URI=${{ secrets.MONGODB_URI }} \
+              -e SMTP_HOST=${{ secrets.SMTP_HOST }} \
+              -e SMTP_PORT=${{ secrets.SMTP_PORT }} \
+              -e SMTP_USER=${{ secrets.SMTP_USER }} \
+              -e SMTP_PASS=${{ secrets.SMTP_PASS }} \
+              -e IMAP_HOST=${{ secrets.IMAP_HOST }} \
+              -e IMAP_PORT=${{ secrets.IMAP_PORT }} \
+              -e IMAP_USER=${{ secrets.IMAP_USER }} \
+              -e IMAP_PASS=${{ secrets.IMAP_PASS }} \
+              --restart=always \
+              --name mailforge \
+              junaid634/mailforge:latest
+
        
